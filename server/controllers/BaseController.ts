@@ -6,5 +6,5 @@ interface IBodyResponse {
 }
 
 export abstract class BaseController {
-  protected responseData: IBodyResponse = { success: true };
+  protected responseData: IBodyResponse = { success: false };
 }
