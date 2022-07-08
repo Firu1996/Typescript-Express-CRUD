@@ -9,3 +9,4 @@ employeeRouter.post("/", employeeController.createEmployee());
 employeeRouter.get("/", employeeController.fetchEmployee());
 employeeRouter.get("/:id", employeeController.fetchEmployeeById());
 employeeRouter.delete("/:id", employeeController.deleteEmployeeById());
+employeeRouter.patch("/:id", employeeController.updateEmployee());
