@@ -87,4 +87,31 @@ export class EmployeeController extends BaseController {
       }
     };
   }
+
+  updateEmployee(): RequestHandler {
+    return async (req, res) => {
+      const { id } = req.params;
+      try {
+        const employee = await employeeModel.findById(id);
+
+        if (!employee) {
+          this.responseData = { success: false };
+          res.locals = {
+            ...this.responseData,
+            msg: "Employee not found",
+          };
+          res.send(res.locals);
+        }
+        await employee?.updateOne(req.body);
+        this.responseData = { success: true };
+        res.locals = {
+          ...this.responseData,
+          msg: "Employee Updated",
+        };
+        res.status(200).send(res.locals);
+      } catch (err) {
+        throw new Error("Error at Update");
+      }
+    };
+  }
 }
