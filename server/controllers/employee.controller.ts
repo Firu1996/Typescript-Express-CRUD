@@ -2,10 +2,6 @@ import { RequestHandler } from "express";
 import { BaseController } from "./BaseController";
 import employeeModel from "../models/employee.model";
 
-interface IFetchById {
-  id: string;
-}
-
 export class EmployeeController extends BaseController {
   constructor() {
     super();
@@ -31,35 +27,64 @@ export class EmployeeController extends BaseController {
 
   fetchEmployee(): RequestHandler {
     return async (req, res) => {
-      const employeeList = await employeeModel.find();
+      try {
+        const employeeList = await employeeModel.find();
 
-      this.responseData = { success: true, data: employeeList };
-      res.locals = { ...this.responseData };
-      res.status(200).send(res.locals);
+        this.responseData = { success: true, data: employeeList };
+        res.locals = { ...this.responseData };
+        res.status(200).send(res.locals);
+      } catch (err) {
+        throw err;
+      }
     };
   }
 
-  fetchEmployeeById(params: IFetchById): RequestHandler {
+  fetchEmployeeById(): RequestHandler {
     return async (req, res) => {
-      const { id } = params;
-      if (!id) {
-        res.locals = { ...this.responseData, msg: "Please enter employee id" };
-        res.send(res.locals);
-      }
+      const { id } = req.params;
+      try {
+        const employee = await employeeModel.findById(id);
 
-      const employee = await employeeModel.findById(id);
-      if (employee === null) {
+        if (!employee) {
+          this.responseData = { success: true };
+          res.locals = {
+            ...this.responseData,
+            data: employee,
+            msg: "Employee not found",
+          };
+          res.send(res.locals);
+        }
+
         this.responseData = { success: true };
-        res.locals = {
-          ...this.responseData,
-          data: employee,
-          msg: "Employee not found",
-        };
+        res.locals = { ...this.responseData, data: employee };
+        res.status(200).send(res.locals);
+      } catch (err) {
+        throw new Error("Error at findById");
       }
+    };
+  }
 
-      this.responseData = { success: true };
-      res.locals = { ...this.responseData, data: employee };
-      res.status(200).send(res.locals);
+  deleteEmployeeById(): RequestHandler {
+    return async (req, res) => {
+      const { id } = req.params;
+      try {
+        const employee = await employeeModel.findById(id);
+
+        if (!employee) {
+          this.responseData = { success: false };
+          res.locals = {
+            ...this.responseData,
+            msg: "Employee not found",
+          };
+          res.send(res.locals);
+        }
+        await employee?.deleteOne();
+        this.responseData = { success: true };
+        res.locals = { ...this.responseData, msg: "Employee Deleted" };
+        res.status(200).send(res.locals);
+      } catch (err) {
+        throw new Error("Error at delete");
+      }
     };
   }
 }
