@@ -6,3 +6,4 @@ export const employeeRouter = Router();
 const employeeController = new EmployeeController();
 
 employeeRouter.post("/", employeeController.createEmployee());
+employeeRouter.get("/", employeeController.fetchEmployee());
